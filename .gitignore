@@ -2,6 +2,7 @@
 .dart_tool/
 
 lib/firebase_options.dart
+firebase_options.dart
 
 .packages
 .pub/
