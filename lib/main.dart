@@ -8,6 +8,7 @@ void main() {
     themeMode: ThemeMode.dark,
     highContrastDarkTheme: ThemeData.dark(),
     theme: ThemeData(
+      colorScheme: const ColorScheme.dark(),
       useMaterial3: true,
     ),
     home: const LoginScreen(),
