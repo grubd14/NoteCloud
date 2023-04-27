@@ -1,6 +1,8 @@
 .DS_Store
 .dart_tool/
 
+.lib/firebase_options.dart
+
 .packages
 .pub/
 
