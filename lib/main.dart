@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import "package:firebase_auth/firebase_auth.dart";
+import 'package:note_cloud/screens/login_screen.dart';
+import 'package:note_cloud/screens/register_screen.dart';
+import 'package:note_cloud/screens/verify_email_screen.dart';
 import 'firebase_options.dart';
 
 void main() {
@@ -14,6 +17,10 @@ void main() {
       useMaterial3: true,
     ),
     home: const Homepage(),
+    routes: {
+      '/login/': (context) => const LoginScreen(),
+      '/register/': (context) => const RegisterScreen(),
+    },
   ));
 }
 
@@ -22,42 +29,35 @@ class Homepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Home Page"),
-        ),
-        body: FutureBuilder(
-          future: Firebase.initializeApp(
-            options: DefaultFirebaseOptions.currentPlatform,
-          ),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                final user = FirebaseAuth.instance.currentUser;
-                if (user!.emailVerified) {
-                  print("You are verfied");
-                } else {
-                  print('Verify your Email Address');
-                }
-                return const Text('Done');
-              default:
-                return const Text("Loading.......");
+    return FutureBuilder(
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              if (user.emailVerified) {
+                print('Email is verified');
+              } else {
+                return const EmailVerifyScreen();
+              }
+            } else {
+              return const LoginScreen();
             }
-          },
-        ));
-  }
-}
 
-class EmailVerifyScreen extends StatefulWidget {
-  const EmailVerifyScreen({super.key});
-
-  @override
-  State<EmailVerifyScreen> createState() => _EmailVerifyScreenState();
-}
-
-class _EmailVerifyScreenState extends State<EmailVerifyScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold();
+            // final user = FirebaseAuth.instance.currentUser;
+            // if (user?.emailVerified ?? false) {
+            //   return const Text('Done');
+            // } else {
+            //   return const EmailVerifyScreen();
+            // }
+            return const LoginScreen();
+          default:
+            return const CircularProgressIndicator();
+        }
+      },
+    );
   }
 }
