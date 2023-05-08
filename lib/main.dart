@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:note_cloud/screens/login_screen.dart';
+import 'package:note_cloud/screens/notes_screen.dart';
 import 'package:note_cloud/screens/register_screen.dart';
 import 'package:note_cloud/screens/verify_email_screen.dart';
 import 'firebase_options.dart';
@@ -39,7 +40,7 @@ class Homepage extends StatelessWidget {
             final user = FirebaseAuth.instance.currentUser;
             if (user != null) {
               if (user.emailVerified) {
-                print('Email is verified');
+                return const NotesScreen();
               } else {
                 return const EmailVerifyScreen();
               }
@@ -47,17 +48,17 @@ class Homepage extends StatelessWidget {
               return const LoginScreen();
             }
 
-            // final user = FirebaseAuth.instance.currentUser;
-            // if (user?.emailVerified ?? false) {
-            //   return const Text('Done');
-            // } else {
-            //   return const EmailVerifyScreen();
-            // }
-            return const LoginScreen();
+          // final user = FirebaseAuth.instance.currentUser;
+          // if (user?.emailVerified ?? false) {
+          //   return const Text('Done');
+          // } else {
+          //   return const EmailVerifyScreen();
+          // }
           default:
-            return const CircularProgressIndicator();
+            return const Text('hello');
         }
       },
     );
   }
 }
+

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:note_cloud/screens/notes_screen.dart';
 
 import '../firebase_options.dart';
 
@@ -32,7 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title:const Text('Login Screen'),),
+      appBar: AppBar(
+        title: const Text('Login Screen'),
+      ),
       body: Column(
         children: [
           Padding(
@@ -64,7 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
-    
+
+              // Navigator.of(context).push(
+              //     MaterialPageRoute(builder: (context) => const NotesScreen()));
+
               try {
                 final userCredential =
                     await FirebaseAuth.instance.signInWithEmailAndPassword(
