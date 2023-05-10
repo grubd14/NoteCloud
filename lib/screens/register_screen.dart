@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../constants/constants_screens.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -83,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           TextButton(
               onPressed: () {
               Navigator.pushNamedAndRemoveUntil(
-                  context, '/login/', (route) => false);
+                  context, loginRoute, (route) => false);
             },
             child: const Text('Login Now!'))
         ],

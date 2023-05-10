@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:note_cloud/screens/login_screen.dart';
 import 'dart:developer' as devtools show log;
+
+import '../constants/constants_screens.dart';
 
 enum MenuAction { logout }
 
@@ -46,7 +47,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 if (shouldLogout) {
                   await FirebaseAuth.instance.signOut();
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/login/', (_) => false);
+                      .pushNamedAndRemoveUntil(loginRoute, (_) => false);
                 }
                 // Navigator.of(context).push(MaterialPageRoute(
                 //     builder: (context) => const LoginScreen()));

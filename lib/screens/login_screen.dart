@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:note_cloud/screens/notes_screen.dart';
 
-import '../firebase_options.dart';
+import '../constants/constants_screens.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -72,19 +70,27 @@ class _LoginScreenState extends State<LoginScreen> {
               //     MaterialPageRoute(builder: (context) => const NotesScreen()));
 
               try {
-                final userCredential =
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
                   email: email,
                   password: password,
                 );
-                print(userCredential);
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  notesRoute,
+                  (route) => false,
+                );
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-not-found') {
-                  print('USER NOT FOUND');
+                  await showErrorDialog(
+                    context,
+                    'User was not found',
+                  );
                 } else if (e.code == 'wrong-password') {
-                  print('WRONG PASSWORD');
+                  await showErrorDialog(
+                    context,
+                    'You entered the wrong password',
+                  );
                 }
-                ;
               }
             },
             child: const Text('Login'),
@@ -92,11 +98,32 @@ class _LoginScreenState extends State<LoginScreen> {
           TextButton(
               onPressed: () {
                 Navigator.pushNamedAndRemoveUntil(
-                    context, '/register/', (route) => false);
+                    context, registerRoute, (route) => false);
               },
               child: const Text('Not Registered yet? Register Here'))
         ],
       ),
     );
   }
+}
+
+Future<void> showErrorDialog(
+  BuildContext context,
+  String text,
+) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('An Error Occured!'),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Ok'))
+        ],
+      );
+    },
+  );
 }

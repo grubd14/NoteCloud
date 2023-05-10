@@ -5,6 +5,7 @@ import 'package:note_cloud/screens/login_screen.dart';
 import 'package:note_cloud/screens/notes_screen.dart';
 import 'package:note_cloud/screens/register_screen.dart';
 import 'package:note_cloud/screens/verify_email_screen.dart';
+import 'constants/constants_screens.dart';
 import 'firebase_options.dart';
 
 void main() {
@@ -19,8 +20,9 @@ void main() {
     ),
     home: const Homepage(),
     routes: {
-      '/login/': (context) => const LoginScreen(),
-      '/register/': (context) => const RegisterScreen(),
+      loginRoute: (context) => const LoginScreen(),
+      registerRoute: (context) => const RegisterScreen(),
+      notesRoute: (context) => const NotesScreen(),
     },
   ));
 }
@@ -61,4 +63,3 @@ class Homepage extends StatelessWidget {
     );
   }
 }
-
