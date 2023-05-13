@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:note_cloud/auth/auth_exceptions.dart';
+import 'package:note_cloud/auth/auth_service.dart';
+import 'package:note_cloud/screens/error_dialog.dart';
 
 import '../constants/constants_screens.dart';
 
@@ -67,27 +69,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
               final password = _password.text;
 
               try {
-                final userCredential =
-                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                await AuthService.firebase().createUser(
                   email: email,
                   password: password,
                 );
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'email-already-in-use') {
-                  print('EMAIL ALREADY IN USE');
-                } else if (e.code == 'invalid-email') {
-                  print('INVALID EMAIL ENTERED');
-                }
+
+                Navigator.of(context).pushNamed(
+                  verifyEmailRoute,
+                );
+                AuthService.firebase().sendVerificationEmail();
+
+              } on EmailAlreadyInUseAuthException {
+                await showErrorDialog(
+                  context,
+                  'Email already in use',
+                );
+              } on InvalidEmailAuthException {
+                await showErrorDialog(
+                  context,
+                  'Invalid email',
+                );
+              } on GenericAuthException {
+                await showErrorDialog(
+                  context,
+                  'Error in Authentication ',
+                );
               }
             },
             child: const Text('Register'),
           ),
           TextButton(
               onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, loginRoute, (route) => false);
-            },
-            child: const Text('Login Now!'))
+                Navigator.pushNamedAndRemoveUntil(
+                    context, loginRoute, (route) => false);
+              },
+              child: const Text('Login Now!'))
         ],
       ),
     );

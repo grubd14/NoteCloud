@@ -1,0 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
+class AuthUser {
+  final bool isEmailVerfied;
+  const AuthUser(this.isEmailVerfied);
+
+  factory AuthUser.fromFirebase(User user) => AuthUser(user.emailVerified);
+}

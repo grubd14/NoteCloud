@@ -1,12 +1,10 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import "package:firebase_auth/firebase_auth.dart";
+import 'package:note_cloud/auth/auth_service.dart';
 import 'package:note_cloud/screens/login_screen.dart';
 import 'package:note_cloud/screens/notes_screen.dart';
 import 'package:note_cloud/screens/register_screen.dart';
 import 'package:note_cloud/screens/verify_email_screen.dart';
 import 'constants/constants_screens.dart';
-import 'firebase_options.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +21,7 @@ void main() {
       loginRoute: (context) => const LoginScreen(),
       registerRoute: (context) => const RegisterScreen(),
       notesRoute: (context) => const NotesScreen(),
+      verifyEmailRoute: (context) => const EmailVerifyScreen()
     },
   ));
 }
@@ -33,15 +32,13 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ),
+      future: AuthService.firebase().initialize(),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
-            final user = FirebaseAuth.instance.currentUser;
+            final user = AuthService.firebase().currentUser;
             if (user != null) {
-              if (user.emailVerified) {
+              if (user.isEmailVerfied) {
                 return const NotesScreen();
               } else {
                 return const EmailVerifyScreen();
