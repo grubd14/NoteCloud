@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_cloud/auth/auth_service.dart';
+import 'package:note_cloud/database/notes_service.dart';
 import 'dart:developer' as devtools show log;
 
 import '../constants/constants_screens.dart';
@@ -14,6 +15,27 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreenState extends State<NotesScreen> {
+  late final NoteService _noteService;
+
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+//notes service on the init state
+//opens the database
+
+  @override
+  void initState() {
+    _noteService = NoteService();
+    _noteService.open();
+    super.initState();
+  }
+
+//closes the database
+  @override
+  void dispose() {
+    _noteService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +76,27 @@ class _NotesScreenState extends State<NotesScreen> {
               },
               icon: const Icon(Icons.logout_rounded))
         ],
+      ),
+      body: FutureBuilder(
+        future: _noteService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _noteService.allNotes,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const Text('Waiting for all notes to laod ');
+                    default:
+                      return const CircularProgressIndicator();
+                  }
+                },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
       ),
     );
   }
