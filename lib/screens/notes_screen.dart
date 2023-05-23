@@ -98,6 +98,14 @@ class _NotesScreenState extends State<NotesScreen> {
           }
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add_circle_outline_rounded),
+        onPressed: () async {
+          Navigator.of(context).pushNamed(
+            newNoteRoute,
+          );
+        },
+      ),
     );
   }
 }

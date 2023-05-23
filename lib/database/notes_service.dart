@@ -38,8 +38,10 @@ class NoteService {
     _notesStreamController.add(_notes);
   }
 
-  Future<DatabaseNote> updateNotes(
-      {required DatabaseNote note, required String text}) async {
+  Future<DatabaseNote> updateNotes({
+    required DatabaseNote note,
+    required String text,
+  }) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     await getNote(id: note.id);
@@ -68,6 +70,7 @@ class NoteService {
   }
 
   Future<DatabaseNote> getNote({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final notes = await db.query(
       noteTable,
@@ -97,6 +100,7 @@ class NoteService {
   }
 
   Future<void> deleteNote({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       noteTable,
@@ -112,6 +116,7 @@ class NoteService {
   }
 
   Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final dbUser = await getUser(email: owner.email);
     if (dbUser != owner) {
@@ -140,6 +145,7 @@ class NoteService {
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -189,6 +195,25 @@ class NoteService {
     );
   }
 
+  Future<void> open() async {
+    if (_db != null) {
+      throw DatabaseAlreadyOpenedException();
+    }
+    try {
+      final docsPath = await getApplicationDocumentsDirectory();
+      final dbPath = join(docsPath.path, dbName);
+      final db = await openDatabase(dbPath);
+      _db = db;
+
+      await db.execute(createUserTable);
+
+      await db.execute(createNoteTable);
+      await _cacheNotes();
+    } on MissingPlatformDirectoryException {
+      throw UnableToGetDocumentDirectoryException();
+    }
+  }
+
 //a private function to get the current database
   Database _getDatabaseOrThrow() {
     final db = _db;
@@ -211,25 +236,8 @@ class NoteService {
   Future<void> _ensureDbIsOpen() async {
     try {
       await open();
-    } on DatabaseAlreadyOpenedException {}
-  }
-
-  Future<void> open() async {
-    if (_db != null) {
-      throw DatabaseAlreadyOpenedException();
-    }
-    try {
-      final docsPath = await getApplicationDocumentsDirectory();
-      final dbPath = join(docsPath.path, dbName);
-      final db = await openDatabase(dbPath);
-      _db = db;
-
-      await db.execute(createUserTable);
-
-      await db.execute(createNoteTable);
-      await _cacheNotes();
-    } on MissingPlatformDirectoryException {
-      throw UnableToGetDocumentDirectoryException();
+    } on DatabaseAlreadyOpenedException {
+      //empty
     }
   }
 }
@@ -300,7 +308,7 @@ const textColumn = 'text';
 const syncedColumn = 'synced_cloud';
 
 const createUserTable = '''
-          CREATE TABLE IF USER NOT EXISTS "user" (
+          CREATE TABLE IF NOT EXISTS "user" (
 	          "id"	INTEGER NOT NULL,
 	          "email"	TEXT NOT NULL UNIQUE,
 	          PRIMARY KEY("id" AUTOINCREMENT)

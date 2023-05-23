@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:note_cloud/auth/auth_service.dart';
 import 'package:note_cloud/screens/login_screen.dart';
+import 'package:note_cloud/screens/new_notes_screen.dart';
 import 'package:note_cloud/screens/notes_screen.dart';
 import 'package:note_cloud/screens/register_screen.dart';
 import 'package:note_cloud/screens/verify_email_screen.dart';
@@ -21,7 +22,8 @@ void main() {
       loginRoute: (context) => const LoginScreen(),
       registerRoute: (context) => const RegisterScreen(),
       notesRoute: (context) => const NotesScreen(),
-      verifyEmailRoute: (context) => const EmailVerifyScreen()
+      verifyEmailRoute: (context) => const EmailVerifyScreen(),
+      newNoteRoute: (context) => const NewNoteScreen(),
     },
   ));
 }
