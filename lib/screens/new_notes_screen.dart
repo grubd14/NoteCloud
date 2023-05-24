@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:markdown/markdown.dart' as markdown;
 import 'package:note_cloud/auth/auth_service.dart';
 import 'package:note_cloud/database/notes_service.dart';
 
@@ -14,6 +16,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
   late final NoteService _noteService;
 
   late final TextEditingController _textController;
+  String _parsedText = "";
 
   @override
   void initState() {
@@ -37,6 +40,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
   void _setupTextControllerListener() {
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
+    _textController.addListener(_parseMarkdown);
   }
 
   Future<DatabaseNote> createNewNote() async {
@@ -68,6 +72,14 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
     }
   }
 
+  void _parseMarkdown() {
+    String markdownText = _textController.text;
+    String parsedText = markdown.markdownToHtml(markdownText);
+    setState(() {
+      _parsedText = parsedText;
+    });
+  }
+
   @override
   void dispose() {
     _deleteNoteIfTextIsEmpty();
@@ -82,30 +94,34 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
       appBar: AppBar(
         title: const Text('New Note'),
       ),
-      body: FutureBuilder(
-        future: createNewNote(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote;
-              _setupTextControllerListener();
-              return Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: TextField(
-                  controller: _textController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  decoration: const InputDecoration(
-                    hintText: 'Start typing here...'
-                  ),
-                ),
-              );
-            default:
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-          }
-        },
+      body: Column(
+        children: [
+          FutureBuilder(
+            future: createNewNote(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.done:
+                  _note = snapshot.data as DatabaseNote;
+                  _setupTextControllerListener();
+                  return Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: TextField(
+                      controller: _textController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                          hintText: 'Start typing here...'),
+                    ),
+                  );
+                default:
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+              }
+            },
+          ),
+          HtmlWidget(_parsedText)
+        ],
       ),
     );
   }
